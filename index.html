@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body {
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    background: #fff;
+  }
+  canvas {
+    border: 1px solid #333;
+    background: #fff;
+    max-width: 95vw;
+    height: auto;
+  }
+  #controls {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+  }
+  input[type=number] {
+    width: 60px;
+  }
+  button {
+    padding: 8px 12px;
+    font-size: 16px;
+  }
+  input[type=file] {
+    font-size: 16px;
+  }
+  label {
+    font-size: 16px;
+  }
+  #currentPin {
+    font-weight: bold;
+    margin-left: 10px;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div id="controls">
+  <input type="file" id="fileInput" accept=".txt">
+  <button onclick="loadFile()">Upload</button>
+  <button onclick="step(-100)">«100</button>
+  <button onclick="step(-1)">«1</button>
+  <button onclick="step(1)">1»</button>
+  <button onclick="step(100)">100»</button>
+  <label>Line width: <input type="number" id="lineWidth" min="1" max="100" value="10"></label>
+  <span>Step: <span id="currentStep">0</span> / <span id="totalSteps">0</span></span>
+  <span id="currentPin">Pin: 0</span>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let pinCount = 240;
+let pins = [];
+let sequence = [];
+let currentIndex = 0;
+
+// Responsive canvas
+function resizeCanvas() {
+  const size = Math.min(window.innerWidth * 0.95, 400); // max 400px
+  canvas.width = size;
+  canvas.height = size;
+  computePins();
+  drawLines(currentIndex);
+}
+
+// Compute pin positions based on current canvas size
+function computePins() {
+  pins = [];
+  const radius = canvas.width / 2 * 0.9; // leave margin
+  for (let i = 0; i < pinCount; i++) {
+    const angle = (2 * Math.PI / pinCount) * i - Math.PI/2;
+    pins.push({ x: radius * Math.cos(angle), y: radius * Math.sin(angle) });
+  }
+}
+
+// Draw pins and lines (graphical part stays same)
+function drawLines(step) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  ctx.save();
+  ctx.translate(canvas.width/2, canvas.height/2);
+  ctx.rotate(Math.PI / 2); // 90° rotation
+
+  // Draw pins
+  ctx.fillStyle = '#000';
+  for (let pin of pins) {
+    ctx.beginPath();
+    ctx.arc(pin.x, pin.y, 1.5, 0, 2 * Math.PI);
+    ctx.fill();
+  }
+
+  // Draw lines
+  ctx.strokeStyle = '#000';
+  let userWidth = parseInt(document.getElementById('lineWidth').value, 10) || 10;
+  ctx.lineWidth = Math.max(0.1, userWidth / 100);
+  for (let i = 0; i < step && i < sequence.length - 1; i++) {
+    const start = pins[sequence[i]];
+    const end = pins[sequence[i + 1]];
+    ctx.beginPath();
+    ctx.moveTo(start.x, start.y);
+    ctx.lineTo(end.x, end.y);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+
+  // Update current pin number in the menu
+  if(sequence.length > 0 && step > 0) {
+    document.getElementById('currentPin').textContent = "Pin: " + sequence[step-1];
+  } else {
+    document.getElementById('currentPin').textContent = "Pin: 0";
+  }
+}
+
+// Step navigation
+function step(amount) {
+  currentIndex += amount;
+  if (currentIndex < 0) currentIndex = 0;
+  if (currentIndex > sequence.length - 1) currentIndex = sequence.length - 1;
+  document.getElementById('currentStep').textContent = currentIndex;
+  drawLines(currentIndex);
+}
+
+// Load file
+function loadFile() {
+  const fileInput = document.getElementById('fileInput');
+  const file = fileInput.files[0];
+  if (!file) return alert("Please select a pin.txt file");
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const content = e.target.result.trim();
+    sequence = content.split(/[\s,]+/).map(Number);
+    currentIndex = 0;
+    document.getElementById('currentStep').textContent = currentIndex;
+    document.getElementById('totalSteps').textContent = sequence.length - 1;
+    drawLines(currentIndex);
+  }
+  reader.readAsText(file);
+}
+
+// Update line width dynamically
+document.getElementById('lineWidth').addEventListener('change', () => drawLines(currentIndex));
+
+window.addEventListener('resize', resizeCanvas);
+
+// Initialize
+resizeCanvas();
+</script>
+
+</body>
+</html>
