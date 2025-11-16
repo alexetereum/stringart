@@ -166,6 +166,14 @@ input[type=file] { background: #fff; color: #333; }
 <!-- BOTTONI VELOCI -->
 <div id="fastNavButtons">
   <button onclick="step(-100)" id="back100">« -100</button>
+  <button onclick="window.location.href='visual.html'" style="display:flex; align-items:center; gap:5px; padding:8px 12px; font-size:16px; cursor:pointer;">
+  <!-- Eye icon SVG -->
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+    <circle cx="12" cy="12" r="3"/>
+  </svg>
+  View
+  </button>
   <button onclick="step(100)" id="forward100">+100 »</button>
 </div>
 
@@ -330,3 +338,4 @@ window.speechSynthesis.onvoiceschanged = () => {};
 </script>
 </body>
 </html>
+
