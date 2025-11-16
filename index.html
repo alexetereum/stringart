@@ -66,17 +66,26 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: 
   <button onclick="loadFile()">Load</button>
 </div>
 
-<script>
-let sequence = [];
+<script>let sequence = [];
 let currentIndex = 0;
 let autoInterval = null;
-let audioEnabled = false;
+let audioEnabled = false; // Tracks if user enabled audio
 
-// Enable audio on button click
+// Enable audio button click
 document.getElementById('enableAudioBtn').addEventListener('click', () => {
   audioEnabled = true;
-  window.speechSynthesis.speak(new SpeechSynthesisUtterance('Audio enabled'));
+
+  // Directly speak something on this click to unlock audio
+  const utterance = new SpeechSynthesisUtterance('Audio enabled');
+  utterance.lang = 'it-IT';
+  window.speechSynthesis.speak(utterance);
+
   document.getElementById('enableAudioBtn').style.display = 'none';
+
+  // Optional: speak the current number immediately
+  if (sequence.length > 0) {
+    speakNumber(sequence[currentIndex]);
+  }
 });
 
 // Initialize pins
@@ -95,7 +104,7 @@ function initializePins() {
   }
 }
 
-// Highlight current pin
+// Highlight current pin and auto-scroll
 function highlightCurrentPin() {
   const container = document.getElementById('pinDisplay');
   const pins = container.children;
@@ -113,12 +122,15 @@ function highlightCurrentPin() {
 
   document.getElementById('prevBtn').disabled = currentIndex <= 0;
   document.getElementById('nextBtn').disabled = currentIndex >= sequence.length - 1;
+
   saveMemory();
   updateProgress();
 
+  // Speak number only if audio enabled
   speakNumber(sequence[currentIndex]);
 }
 
+// Step through sequence manually
 function step(amount) {
   currentIndex += amount;
   if (currentIndex < 0) currentIndex = 0;
@@ -126,6 +138,7 @@ function step(amount) {
   highlightCurrentPin();
 }
 
+// Autoplay toggle
 function toggleAuto() {
   const btn = document.getElementById('autoBtn');
   if (autoInterval) {
@@ -145,6 +158,7 @@ function toggleAuto() {
   }
 }
 
+// Update speed display
 const speedInput = document.getElementById('speedInput');
 const speedValue = document.getElementById('speedValue');
 speedInput.addEventListener('input', () => {
@@ -152,6 +166,7 @@ speedInput.addEventListener('input', () => {
   if (autoInterval) { toggleAuto(); toggleAuto(); }
 });
 
+// Load sequence file
 function loadFile() {
   const fileInput = document.getElementById('fileInput');
   const file = fileInput.files[0];
@@ -166,6 +181,7 @@ function loadFile() {
   reader.readAsText(file);
 }
 
+// Save/load local storage
 function saveMemory() {
   localStorage.setItem('stringart_sequence', JSON.stringify(sequence));
   localStorage.setItem('stringart_index', currentIndex);
@@ -182,6 +198,7 @@ function loadFromMemory() {
   }
 }
 
+// Save position archive
 function savePosition() {
   let archive = JSON.parse(localStorage.getItem('stringart_archive') || '[]');
   archive.unshift({index: currentIndex, sequence: sequence});
@@ -190,36 +207,41 @@ function savePosition() {
   alert('Position saved!');
 }
 
+// Update progress display
 function updateProgress() {
   document.getElementById('progress').textContent = `${currentIndex + 1} / ${sequence.length}`;
 }
 
+// Speak number if audio enabled
 function speakNumber(num) {
   if (!audioEnabled) return;
-
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(num.toString());
   utterance.lang = 'it-IT';
+
   const voices = window.speechSynthesis.getVoices();
   const italianFemale = voices.find(voice =>
     voice.lang.startsWith('it') && /female|feminine|f/i.test(voice.name)
   );
+
   if (italianFemale) utterance.voice = italianFemale;
   else {
     const italianVoice = voices.find(voice => voice.lang.startsWith('it'));
     if (italianVoice) utterance.voice = italianVoice;
   }
+
   utterance.rate = 1;
   utterance.pitch = 1.2;
   window.speechSynthesis.speak(utterance);
 }
 
+// Ensure voices are loaded
 window.speechSynthesis.onvoiceschanged = () => {};
 
-// Initialize
+// Initialize on load
 loadFromMemory();
 speedValue.textContent = speedInput.value + 's';
-
 </script>
 </body>
 </html>
+
