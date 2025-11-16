@@ -5,43 +5,117 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   body {
-    margin: 10px;
+    margin: 0;
+    padding: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-family: Arial, sans-serif;
-    background: #fff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f5f5;
+    color: #333;
   }
+
   canvas {
-    border: 1px solid #333;
+    border-radius: 12px;
+    border: 2px solid #555;
     background: #fff;
     max-width: 95vw;
     height: auto;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin-bottom: 15px;
   }
+
   #controls {
-    margin-top: 10px;
+    width: 95%;
+    max-width: 420px;
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
     justify-content: center;
     align-items: center;
+    padding: 10px;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   }
+
   input[type=number] {
     width: 60px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    padding: 4px;
   }
+
   button {
     padding: 8px 12px;
     font-size: 16px;
+    border-radius: 6px;
+    border: none;
+    background: #333;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
   }
+
+  button:hover {
+    background: #555;
+  }
+
   input[type=file] {
-    font-size: 16px;
+    font-size: 15px;
   }
+
   label {
-    font-size: 16px;
+    font-size: 15px;
   }
+
   #currentPin {
     font-weight: bold;
     margin-left: 10px;
+  }
+
+  /* Group step buttons together */
+  .step-buttons {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+
+  /* Back button style */
+  .back-button {
+    background: #777;
+    color: #fff;
+    font-size: 14px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin-top: 4px;
+  }
+
+  .back-button:hover {
+    background: #555;
+  }
+
+  /* Mobile-specific adjustments */
+  @media (max-width: 480px) {
+    #controls {
+      flex-direction: column;
+      padding: 8px;
+      gap: 6px;
+    }
+
+    .step-buttons {
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    button, input[type=file], label {
+      font-size: 14px;
+      padding: 6px 8px;
+    }
+
+    input[type=number] {
+      width: 80%;
+    }
   }
 </style>
 </head>
@@ -52,13 +126,21 @@
 <div id="controls">
   <input type="file" id="fileInput" accept=".txt">
   <button onclick="loadFile()">Upload</button>
-  <button onclick="step(-100)">«100</button>
-  <button onclick="step(-1)">«1</button>
-  <button onclick="step(1)">1»</button>
-  <button onclick="step(100)">100»</button>
+  
+  <!-- Step navigation buttons grouped -->
+  <div class="step-buttons">
+    <button onclick="step(-100)">«100</button>
+    <button onclick="step(-1)">«1</button>
+    <button onclick="step(1)">1»</button>
+    <button onclick="step(100)">100»</button>
+  </div>
+
   <label>Line width: <input type="number" id="lineWidth" min="1" max="100" value="10"></label>
-  <span>Step: <span id="currentStep">0</span> / <span id="totalSteps">0</span></span>
+  <span style="font-size: 30px; font-weight: bold;">Step: <span id="currentStep">0</span> / <span id="totalSteps">0</span></span>
   <span id="currentPin">Pin: 0</span>
+
+  <!-- Back button -->
+  <button class="back-button" onclick="window.location.href='index.html'">Back</button>
 </div>
 
 <script>
@@ -72,7 +154,7 @@ let currentIndex = 0;
 
 // Responsive canvas
 function resizeCanvas() {
-  const size = Math.min(window.innerWidth * 0.95, 400); // max 400px
+  const size = Math.min(window.innerWidth * 0.95, 400);
   canvas.width = size;
   canvas.height = size;
   computePins();
@@ -82,7 +164,7 @@ function resizeCanvas() {
 // Compute pin positions
 function computePins() {
   pins = [];
-  const radius = canvas.width / 2 * 0.9; // leave margin
+  const radius = canvas.width / 2 * 0.9;
   for (let i = 0; i < pinCount; i++) {
     const angle = (2 * Math.PI / pinCount) * i - Math.PI/2;
     pins.push({ x: radius * Math.cos(angle), y: radius * Math.sin(angle) });
@@ -95,9 +177,8 @@ function drawLines(step) {
 
   ctx.save();
   ctx.translate(canvas.width/2, canvas.height/2);
-  ctx.rotate(Math.PI / 2); // 90° rotation
+  ctx.rotate(Math.PI / 2);
 
-  // Draw pins
   ctx.fillStyle = '#000';
   for (let pin of pins) {
     ctx.beginPath();
@@ -105,7 +186,6 @@ function drawLines(step) {
     ctx.fill();
   }
 
-  // Draw lines
   ctx.strokeStyle = '#000';
   let userWidth = parseInt(document.getElementById('lineWidth').value, 10) || 10;
   ctx.lineWidth = Math.max(0.1, userWidth / 100);
@@ -120,7 +200,6 @@ function drawLines(step) {
 
   ctx.restore();
 
-  // Update current pin number
   if(sequence.length > 0 && step > 0) {
     document.getElementById('currentPin').textContent = "Pin: " + sequence[step-1];
   } else {
@@ -135,6 +214,9 @@ function step(amount) {
   if (currentIndex > sequence.length - 1) currentIndex = sequence.length - 1;
   document.getElementById('currentStep').textContent = currentIndex;
   drawLines(currentIndex);
+
+  // Save current step to localStorage
+  localStorage.setItem('currentStep', currentIndex);
 }
 
 // Load file
@@ -147,30 +229,36 @@ function loadFile() {
   reader.onload = function(e) {
     const content = e.target.result.trim();
     sequence = content.split(/[\s,]+/).map(Number);
-    currentIndex = 0;
+    
+    // Restore last saved step if exists
+    const savedStep = parseInt(localStorage.getItem('currentStep'), 10);
+    currentIndex = savedStep >= 0 && savedStep < sequence.length ? savedStep : 0;
+
     document.getElementById('currentStep').textContent = currentIndex;
     document.getElementById('totalSteps').textContent = sequence.length - 1;
     drawLines(currentIndex);
 
-    // Save to localStorage
+    // Save sequence to localStorage
     localStorage.setItem('pinSequence', JSON.stringify(sequence));
   }
   reader.readAsText(file);
 }
 
-// Load from localStorage if available
+// Load sequence and step from localStorage
 function loadFromMemory() {
   const stored = localStorage.getItem('pinSequence');
   if (stored) {
     sequence = JSON.parse(stored);
-    currentIndex = 0;
+    const savedStep = parseInt(localStorage.getItem('currentStep'), 10);
+    currentIndex = savedStep >= 0 && savedStep < sequence.length ? savedStep : 0;
+
     document.getElementById('currentStep').textContent = currentIndex;
     document.getElementById('totalSteps').textContent = sequence.length - 1;
     drawLines(currentIndex);
   }
 }
 
-// Update line width dynamically
+// Line width listener
 document.getElementById('lineWidth').addEventListener('change', () => drawLines(currentIndex));
 
 window.addEventListener('resize', resizeCanvas);
