@@ -196,35 +196,29 @@ speedInput.addEventListener('input', () => {
 loadFromMemory();
 speedValue.textContent = speedInput.value + 's';
 
+let userInteracted = false;
+
+document.body.addEventListener('click', () => {
+  userInteracted = true;
+}, { once: true });
 
 function speakNumber(num) {
-  window.speechSynthesis.cancel(); // stop any ongoing speech
+  if (!userInteracted) return; // Block speech until first click
 
+  window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(num.toString());
-
-  // Force Italian language
   utterance.lang = 'it-IT';
-
-  // Select voices
   const voices = window.speechSynthesis.getVoices();
-
-  // Prefer a female Italian voice if available
   const italianFemale = voices.find(voice =>
     voice.lang.startsWith('it') && /female|feminine|f/i.test(voice.name)
   );
-
-  if (italianFemale) {
-    utterance.voice = italianFemale;
-  } else {
-    // fallback to any Italian voice
+  if (italianFemale) utterance.voice = italianFemale;
+  else {
     const italianVoice = voices.find(voice => voice.lang.startsWith('it'));
     if (italianVoice) utterance.voice = italianVoice;
   }
-
-  // Optional: make it a bit sweeter
-  utterance.rate = 1;   // normal speed
-  utterance.pitch = 1.2; // slightly higher pitch
-
+  utterance.rate = 1;
+  utterance.pitch = 1.2;
   window.speechSynthesis.speak(utterance);
 }
 
@@ -238,3 +232,4 @@ window.speechSynthesis.onvoiceschanged = () => {};
 </script>
 </body>
 </html>
+
