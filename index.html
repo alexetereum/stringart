@@ -4,46 +4,148 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>String Art Guide</title>
+
 <style>
 html, body { margin: 0; font-family: Arial, sans-serif; background: linear-gradient(to bottom, #f0f4f8, #d9e2ec); height: 100%; overflow-y: auto; }
 header { text-align: center; padding: 8px; font-size: 1.3rem; font-weight: bold; color: #fff; background: #4a90e2; }
+
 #speedControlContainer { display: flex; align-items: center; padding: 5px 10px; background: #eef3f7; font-size: 0.9rem; gap: 5px; flex-wrap: wrap; }
-#speedLabel { flex: 0 0 auto; } #speedInput { flex: 1 1 auto; }
+#speedLabel { flex: 0 0 auto; }
+#speedInput { flex: 1 1 auto; }
+
 #progress { text-align: center; padding: 5px 0; font-size: 2rem; font-weight: bold; background: #dfe7f2; }
 
-#pinDisplay { display: flex; align-items: center; overflow-x: auto; padding: 5px; gap: 10px; height: 35vh; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory; }
+#pinDisplay {
+  display: flex;
+  align-items: center;
+  overflow-x: auto;
+  padding: 5px;
+  gap: 10px;
+  height: 35vh;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+}
 
-.pin-number { flex: 0 0 15%; text-align: center; font-weight: bold; border-radius: 12px; background: #fff; padding: 10px 0; box-shadow: 0 4px 10px rgba(0,0,0,0.1); user-select: none; scroll-snap-align: center; transition: all 0.3s ease; cursor: pointer; }
-.pin-number.current { font-size: 3rem; background: #4a90e2; color: #fff; flex: 0 0 25%; transform: scale(1.2); }
-.pin-number.previous, .pin-number.next { font-size: 1.8rem; color: #555; }
+.pin-number {
+  flex: 0 0 15%;
+  text-align: center;
+  font-weight: bold;
+  border-radius: 12px;
+  background: #fff;
+  padding: 10px 0;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  user-select: none;
+  scroll-snap-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
 
-#navButtons { display: flex; justify-content: space-around; padding: 5px 10px; gap: 10px; margin-bottom: 70px ; margin-top: 50px}
-#navButtons button { flex: 1 1 auto; padding: 12px; font-size: 1.2rem; border-radius: 12px; background: #4a90e2; color: #fff; border: none; box-shadow: 0 3px 6px rgba(0,0,0,0.15); transition: transform 0.1s ease, background 0.2s ease; }
+.pin-number.current {
+  font-size: 3rem;
+  background: #4a90e2;
+  color: #fff;
+  flex: 0 0 25%;
+  transform: scale(1.2);
+}
+
+.pin-number.previous, .pin-number.next {
+  font-size: 1.8rem;
+  color: #555;
+}
+
+/* BOTTONI PRINCIPALI */
+#navButtons {
+  display: flex;
+  justify-content: space-around;
+  padding: 5px 10px;
+  gap: 10px;
+  margin-bottom: 10px;
+  margin-top: 50px;
+}
+
+#navButtons button {
+  flex: 1 1 auto;
+  padding: 12px;
+  font-size: 1.2rem;
+  border-radius: 12px;
+  background: #4a90e2;
+  color: #fff;
+  border: none;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+  transition: transform 0.1s ease, background 0.2s ease;
+}
+
 #navButtons button:active { transform: scale(0.95); }
 #navButtons button:disabled { background: #aaa; }
 
+/* BOTTONI –100 +100 */
+#fastNavButtons {
+  display: flex;
+  justify-content: space-around;
+  padding: 5px 10px;
+  gap: 10px;
+  margin-bottom: 50px;
+}
+
+#fastNavButtons button {
+  flex: 1 1 auto;
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 12px;
+  background: #6aa4e8;
+  color: #fff;
+  border: none;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+  transition: transform 0.1s ease, background 0.2s ease;
+}
+
+#fastNavButtons button:active { transform: scale(0.95); }
+
 #saveButtonContainer { display: none; justify-content: center; padding: 5px 10px;}
-#saveButtonContainer button { padding: 10px 20px; font-size: 1.1rem; border-radius: 12px; background: #4a90e2; color: #fff; border: none; box-shadow: 0 3px 6px rgba(0,0,0,0.15); transition: transform 0.1s ease; }
+#saveButtonContainer button {
+  padding: 10px 20px;
+  font-size: 1.1rem;
+  border-radius: 12px;
+  background: #4a90e2;
+  color: #fff;
+  border: none;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+  transition: transform 0.1s ease;
+}
+
 #saveButtonContainer button:active { transform: scale(0.95); }
 
-#bottomControls { display: flex; justify-content: space-around; padding: 5px 10px; gap: 5px; }
-#bottomControls button, #bottomControls input[type=file] { flex: 1 1 auto; padding: 6px; font-size: 0.9rem; border-radius: 10px; border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1); background: #4a90e2; color: #fff; }
+#bottomControls {
+  display: flex;
+  justify-content: space-around;
+  padding: 5px 10px;
+  gap: 5px;
+}
+
+#bottomControls button,
+#bottomControls input[type=file] {
+  flex: 1 1 auto;
+  padding: 6px;
+  font-size: 0.9rem;
+  border-radius: 10px;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background: #4a90e2;
+  color: #fff;
+}
+
 input[type=file] { background: #fff; color: #333; }
-input[type=range] { -webkit-appearance: none; height: 40px; background: #d0d0d0; border-radius: 5px; outline: none; }
-input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 25px; height: 25px; background: #4a90e2; border-radius: 50%; cursor: pointer; }
 
 @media(max-width: 480px) {
   .pin-number.current { font-size: 2.5rem; flex: 0 0 30%; }
   .pin-number.previous, .pin-number.next { font-size: 1.5rem; flex: 0 0 15%; }
   #navButtons button { font-size: 1rem; padding: 10px; }
-  #saveButtonContainer button { font-size: 1rem; padding: 8px 16px; }
-  #bottomControls button, #bottomControls input[type=file] { font-size: 0.8rem; padding: 5px; }
+  #fastNavButtons button { font-size: 1rem; padding: 10px; }
 }
 </style>
 </head>
 <body>
-
-
 
 <div id="speedControlContainer">
   <span id="speedLabel">Velocità: <span id="speedValue">3.0s</span></span>
@@ -54,10 +156,17 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: 
 
 <div id="pinDisplay"></div>
 
+<!-- BOTTONI PRINCIPALI -->
 <div id="navButtons">
   <button onclick="step(-1)" id="prevBtn" disabled>« Prev</button>
   <button onclick="toggleAuto()" id="autoBtn">▶ Play</button>
   <button onclick="step(1)" id="nextBtn" disabled>Next »</button>
+</div>
+
+<!-- BOTTONI VELOCI -->
+<div id="fastNavButtons">
+  <button onclick="step(-100)" id="back100">« -100</button>
+  <button onclick="step(100)" id="forward100">+100 »</button>
 </div>
 
 <div id="saveButtonContainer">
@@ -74,7 +183,6 @@ let sequence = [];
 let currentIndex = 0;
 let autoInterval = null;
 
-// Initialize pin elements once
 function initializePins() {
   const container = document.getElementById('pinDisplay');
   container.innerHTML = '';
@@ -90,32 +198,33 @@ function initializePins() {
   }
 }
 
-// Highlight current pin and auto-scroll into view
 function highlightCurrentPin() {
   const container = document.getElementById('pinDisplay');
   const pins = container.children;
+
   for (let i = 0; i < pins.length; i++) {
     pins[i].classList.remove('current', 'previous', 'next');
     if (i < currentIndex) pins[i].classList.add('previous');
     else if (i > currentIndex) pins[i].classList.add('next');
   }
+
   if (pins[currentIndex]) pins[currentIndex].classList.add('current');
 
-  // Smooth auto-center
-  const pinEl = pins[currentIndex];
-  const containerCenter = container.offsetWidth / 2;
-  const pinCenter = pinEl.offsetLeft + pinEl.offsetWidth / 2;
-  container.scrollTo({ left: pinCenter - containerCenter, behavior: 'smooth' });
+  // CENTRATURA PERFETTA
+  pins[currentIndex].scrollIntoView({
+    behavior: "smooth",
+    block: "nearest",
+    inline: "center"
+  });
 
   document.getElementById('prevBtn').disabled = currentIndex <= 0;
   document.getElementById('nextBtn').disabled = currentIndex >= sequence.length - 1;
+
   saveMemory();
   updateProgress();
 
-  // 🎤 Speak the current number for every change
   speakNumber(sequence[currentIndex]);
 }
-
 
 function step(amount) {
   currentIndex += amount;
@@ -192,48 +301,31 @@ speedInput.addEventListener('input', () => {
   if (autoInterval) { toggleAuto(); toggleAuto(); }
 });
 
-// Initialize
 loadFromMemory();
 speedValue.textContent = speedInput.value + 's';
 
-
 function speakNumber(num) {
-  window.speechSynthesis.cancel(); // stop any ongoing speech
-
+  window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(num.toString());
-
-  // Force Italian language
   utterance.lang = 'it-IT';
 
-  // Select voices
   const voices = window.speechSynthesis.getVoices();
-
-  // Prefer a female Italian voice if available
   const italianFemale = voices.find(voice =>
     voice.lang.startsWith('it') && /female|feminine|f/i.test(voice.name)
   );
 
-  if (italianFemale) {
-    utterance.voice = italianFemale;
-  } else {
-    // fallback to any Italian voice
+  if (italianFemale) utterance.voice = italianFemale;
+  else {
     const italianVoice = voices.find(voice => voice.lang.startsWith('it'));
     if (italianVoice) utterance.voice = italianVoice;
   }
 
-  // Optional: make it a bit sweeter
-  utterance.rate = 1;   // normal speed
-  utterance.pitch = 1.2; // slightly higher pitch
-
+  utterance.rate = 1;
+  utterance.pitch = 1.2;
   window.speechSynthesis.speak(utterance);
 }
 
-// Ensure voices are loaded in Chrome / some browsers
 window.speechSynthesis.onvoiceschanged = () => {};
-
-
-
-
 
 </script>
 </body>
